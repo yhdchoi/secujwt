@@ -2,11 +2,12 @@ package com.yhdc.secujwt.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yhdc.secujwt.model.RoleType;
 import com.yhdc.secujwt.model.Member;
+import com.yhdc.secujwt.model.RoleType;
 import com.yhdc.secujwt.repository.MemberRepo;
 
 import lombok.RequiredArgsConstructor;
@@ -19,12 +20,16 @@ import lombok.extern.log4j.Log4j2;
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepo memberRepo;
-	
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	@Override
-	public Member saveUser(Member member) {
+	public String saveUser(Member member) {
 		log.info("Saving new user {}", member.getName());
-		return memberRepo.save(member);
+		member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
+		member.setRole(RoleType.ROLE_USER);
+		memberRepo.save(member);
+
+		return "Success";
 	}
 
 	@Override
@@ -49,7 +54,5 @@ public class MemberServiceImpl implements MemberService {
 
 		return memberRepo.findAll();
 	}
-
-	
 
 }

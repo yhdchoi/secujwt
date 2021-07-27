@@ -7,7 +7,7 @@ import com.yhdc.secujwt.model.Member;
 
 public interface MemberService {
 
-	Member saveUser(Member member);
+	String saveUser(Member member);
 
 	void addRoleToUser(String username, RoleType roleName);
 

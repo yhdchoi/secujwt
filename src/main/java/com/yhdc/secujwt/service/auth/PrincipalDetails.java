@@ -8,6 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.yhdc.secujwt.model.Member;
 
+import lombok.Data;
+
+@Data
 public class PrincipalDetails implements UserDetails {
 	
 	private Member member;

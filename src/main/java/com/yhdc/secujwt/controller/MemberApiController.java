@@ -41,11 +41,11 @@ public class MemberApiController {
 	}
 
 	@PostMapping("/user/save")
-	public ResponseEntity<Member> saveUser(@RequestBody Member newUser) {
+	public ResponseEntity<String> saveUser(@RequestBody Member newMember) {
 
-		Member member = memberService.saveUser(newUser);
+		String result = memberService.saveUser(newMember);
 
-		return new ResponseEntity<Member>(member, HttpStatus.OK);
+		return new ResponseEntity<String>(result, HttpStatus.OK);
 	}
 
 	@PostMapping("/user/saverole")

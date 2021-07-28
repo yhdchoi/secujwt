@@ -1,7 +1,8 @@
 package com.yhdc.secujwt.filter;
 
 import java.io.IOException;
-import java.util.Date;
+import java.sql.Date;
+import java.time.LocalDate;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,9 +36,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			throws AuthenticationException {
 
 		ObjectMapper om = new ObjectMapper();
+		Member member = new Member();
 
 		try {
-			Member member = om.readValue(request.getInputStream(), Member.class);
+			member = om.readValue(request.getInputStream(), Member.class);
 
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 					member.getUsername(), member.getPassword());
@@ -47,25 +49,22 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			return authentication;
 
 		} catch (JsonParseException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (JsonMappingException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-
-		return null;
 	}
 
 	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
+	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, 
+			FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
 		PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
-		// HSMAC
 		String jwtToken = JWT.create().withSubject(principalDetails.getUsername())
-				.withExpiresAt(new Date(System.currentTimeMillis() + (60000 * 10)))
+				.withExpiresAt(Date.valueOf(LocalDate.now().plusWeeks(2)))
 				.withClaim("id", principalDetails.getMember().getId())
 				.withClaim("username", principalDetails.getMember().getUsername())
 				.sign(Algorithm.HMAC512(JwtProperties.SECRET));

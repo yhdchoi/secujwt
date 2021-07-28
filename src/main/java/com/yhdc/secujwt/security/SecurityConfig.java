@@ -31,7 +31,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-//		http.addFilterBefore(new SecuFilter1(), SecurityContextPersistenceFilter.class);
 		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().addFilter(corsFilter)
 				.formLogin().disable().httpBasic().disable()

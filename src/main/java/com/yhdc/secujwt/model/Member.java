@@ -33,9 +33,6 @@ public class Member {
 	private Long id;
 
 	@Column(length = 20)
-	private String name;
-
-	@Column(length = 20)
 	private String username;
 
 	private String password;
@@ -50,7 +47,5 @@ public class Member {
 	@Override
 	public String toString() {
 		return "User [role=" + role + "]";
-	}
-	
-	
+	}	
 }

@@ -1,6 +1,7 @@
 package com.yhdc.secujwt.filter;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -13,10 +14,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yhdc.secujwt.model.Member;
+import com.yhdc.secujwt.security.JwtProperties;
+import com.yhdc.secujwt.service.auth.PrincipalDetails;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +34,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
 			throws AuthenticationException {
 
-		// Get password and username
 		ObjectMapper om = new ObjectMapper();
 
 		try {
@@ -38,7 +42,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 			UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
 					member.getUsername(), member.getPassword());
 
-			// PrincioalDetailsService - loadUserByUsername executed = logged in
 			Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
 			return authentication;
@@ -50,19 +53,25 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
-	// Create JWT Token here and response it back
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 
+		PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
-		super.successfulAuthentication(request, response, chain, authResult);
+		// HSMAC
+		String jwtToken = JWT.create().withSubject(principalDetails.getUsername())
+				.withExpiresAt(new Date(System.currentTimeMillis() + (60000 * 10)))
+				.withClaim("id", principalDetails.getMember().getId())
+				.withClaim("username", principalDetails.getMember().getUsername())
+				.sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+		response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
+
 	}
-	
-	
 
 }

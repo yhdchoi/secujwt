@@ -24,7 +24,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public String saveUser(Member member) {
-		log.info("Saving new user {}", member.getName());
+		log.info("Saving new user {}", member.getUsername());
 		member.setPassword(bCryptPasswordEncoder.encode(member.getPassword()));
 		member.setRole(RoleType.ROLE_USER);
 		memberRepo.save(member);

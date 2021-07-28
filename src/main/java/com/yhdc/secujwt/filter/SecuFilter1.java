@@ -27,7 +27,7 @@ public class SecuFilter1 implements Filter {
 				chain.doFilter(req, res);
 			}else {
 				PrintWriter out = res.getWriter();
-				out.println("Not Authenticated");
+				out.println("Unauthorized");
 			}
 		}
 		
